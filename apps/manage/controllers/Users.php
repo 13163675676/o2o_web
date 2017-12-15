@@ -165,4 +165,22 @@ class Users extends \CLASSES\ManageBase
         return false;
     }
 
+    /*ajax 修改用户工作状态*/
+    public function userTaskStatusEdit()
+    {
+        if( isset($_REQUEST['u_id']) && !empty($u_id = intval($_REQUEST['u_id'])))
+        {
+            $result = $this->users_dao->updateData(array('u_task_status' => 0),array('u_id' => $u_id));
+            if ($result) {
+                echo 1;
+                return false;
+            } else {
+                echo -3;/*修改失败*/
+                return false;
+            }
+        }
+        echo 0;
+        return false;
+    }
+
 }

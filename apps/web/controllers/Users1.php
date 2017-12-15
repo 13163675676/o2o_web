@@ -3,7 +3,7 @@
  * @Author: Zhaoyu
  * @Date:   2017-09-16 13:37:26
  * @Last Modified by:   Zhaoyu
- * @Last Modified time: 2017-12-05 16:23:08
+ * @Last Modified time: 2017-11-28 16:35:28
  */
 namespace App\Controller;
 
@@ -441,7 +441,7 @@ class Users extends \CLASSES\WebBase
         if(isset($_REQUEST['u_true_name']) && trim($_REQUEST['u_true_name'])) $data['u_true_name'] = trim($_REQUEST['u_true_name']);
         if(isset($_REQUEST['u_skills']) && trim($_REQUEST['u_skills'])) $data['u_skills'] = trim($_REQUEST['u_skills']);
         if(isset($_REQUEST['u_name']) && trim($_REQUEST['u_name'])) $data['u_name'] = trim($_REQUEST['u_name']);
-        if(isset($_REQUEST['o_status']) && trim($_REQUEST['o_status']) != '') $tmp['o_status'] = trim($_REQUEST['o_status']); //多个用逗号联合
+        if(isset($_REQUEST['o_status']) && trim($_REQUEST['o_status'])) $tmp['o_status'] = trim($_REQUEST['o_status']); //多个用逗号联合
 
         /*区间值*/
 
@@ -549,7 +549,6 @@ class Users extends \CLASSES\WebBase
                 }
 
                 $order_id_arr = array();
-
                 if (isset($tmp['o_status']))
                 {
                 /*获取用户订单列表*/
@@ -584,15 +583,12 @@ class Users extends \CLASSES\WebBase
                             }elseif($value['o_confirm'] == 1){
                                 $v['relation_type'] = 1;
                             }
-
-                            $v['o_confirm'] = $value['o_confirm'];
                         }
 
                     }
                 }
                 if($v['relation'] == 0){
                     $v['relation_type'] = 0;
-                    $v['o_confirm'] = -1;
                 }
 
             }
@@ -648,52 +644,21 @@ class Users extends \CLASSES\WebBase
 
                         'pager'=>false,
                         'pfl_reason'=>'payorder',
-                        'where'=>'pfl_type_id IN ('.$o_str.') AND pfl_amount < 0',
-                        'fields'=>'pfl_amount as amount,pfl_id as id ,pfl_in_time as time,pfl_last_editor as balances, "income"',
-                    )
-                );
-            }
-
-            /*订单改价后退换日志*/
-            $dao_task = new \WDAO\Users(array('table'=>'tasks'));
-            $payorder_list_u_id = $dao_task ->listData(
-                array(
-                    't_author'=>$u_id,
-                    'pager'=>false,
-                    'where'=>'t_status > 0',
-                    'fields'=>'t_id'
-                    )
-                );
-            $id_arr=array();
-            foreach ($payorder_list_u_id['data'] as $value) {
-                $id_arr[] = $value['t_id'];
-            }
-            $o_str = '';
-            $o_str = implode(',',$id_arr);
-
-            $retrun_list['data'] = array();
-            if(!empty($o_str)){
-                /*日志*/
-                $retrun_list = $dao_platform_funds_log ->listData(
-                    array(
-                        'pager'=>false,
-                        'pfl_reason'=>'taskretrun',
-                        'pfl_type' => 3,
                         'where'=>'pfl_type_id IN ('.$o_str.')',
-                        'fields'=>'pfl_amount as amount,pfl_id as id ,pfl_in_time as time,pfl_last_editor as balances,pfl_rate, "taskretrun"',
+                        'fields'=>'pfl_amount as amount,pfl_id as id ,pfl_in_time as time,pfl_last_editor as balances, "income"',
                     )
                 );
             }
 
             $time = array();
             $arr = array();
-            $r_data = array_merge($recharge_list['data'],$payorder_list['data'],$retrun_list['data']);
+            $r_data = array_merge($recharge_list['data'],$payorder_list['data']);
             foreach ($r_data as $k => $v) {
                 $time[$k]  = $v['time'];
                 $arr[$k] = $v;
-                $r_data[$k]['amount'] = $v['amount'];
+                $r_data[$k]['amount'] = abs($v['amount']);
             }
-            // $res = array_multisort($time, SORT_DESC, $arr, SORT_ASC, $r_data);
+            $res = array_multisort($time, SORT_DESC, $arr, SORT_ASC, $r_data);
         }
 
 
@@ -731,13 +696,11 @@ class Users extends \CLASSES\WebBase
 
                         'pager'=>false,
                         'pfl_reason'=>'payorder',
-                        'where'=>'pfl_type_id IN ('.$o_str.') AND pfl_amount > 0',
+                        'where'=>'pfl_type_id IN ('.$o_str.')',
                         'fields'=>'pfl_amount as amount,pfl_id as id ,pfl_in_time as time,pfl_last_editor as balances,pfl_rate, "pay"',
                     )
                 );
             }
-
-
             $time = array();
             $arr = array();
             $w_data = array_merge($withdraw_list['data'],$payorder_list['data']);
@@ -745,16 +708,14 @@ class Users extends \CLASSES\WebBase
             foreach ($w_data as $k => $v) {
                 /*订单收入金额修改*/
                 if(isset($v['pfl_rate']) && floatval($v['pfl_rate']) > 0){
-
                     $w_data[$k]['amount'] = $v['amount']/(1-floatval($v['pfl_rate']));
                     unset($w_data[$k]['pfl_rate']);
-
                 }
                 $time[$k]  = $v['time'];
                 $arr[$k] = $v;
             }
 
-            // $res = array_multisort($time, SORT_DESC, $arr, SORT_ASC, $w_data);
+            $res = array_multisort($time, SORT_DESC, $arr, SORT_ASC, $w_data);
         }
 
 /*支出收入订单合并*/
@@ -783,9 +744,6 @@ class Users extends \CLASSES\WebBase
             }elseif(isset($value['income'])){
                 $value['type'] = 'income';
                 unset($value['income']);
-            }elseif(isset($value['taskretrun'])){
-                $value['type'] = 'taskretrun';
-                unset($value['taskretrun']);
             }else{
 
             }
@@ -794,7 +752,7 @@ class Users extends \CLASSES\WebBase
                 $value['amount'] = $value['amount'] * -1;
             }
 
-            $value['amount'] = number_format($value['amount'], 2, '.', '');
+            $value['amount'] = number_format($value['amount'], 2, ',', '');
 
         }
         $this->exportData( array('data'=>$data),1);
@@ -1634,6 +1592,7 @@ class Users extends \CLASSES\WebBase
             $this ->exportData( array('msg'=>'密码修改失败,请联系管理员'),0);
         }
     }
+
 
 
 

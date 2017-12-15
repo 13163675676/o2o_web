@@ -84,9 +84,10 @@
                                     {{if $info.u_type == 9}}内部测试用户{{/if}}
                                 </td>
                                 <th class="text-nowrap">任务状态：</th>
-                                <td>
+                                <td id='task_status'>
                                     {{if $info.u_task_status == 1}}在忙{{/if}}
                                     {{if $info.u_task_status == 0}}闲置{{/if}}
+                                    <input type="button" value="释放工人" onclick="taskStatusEdit();">
                                 </td>
                                 <th class="text-nowrap">星级：</th>
                                 <td>{{$info.u_start}}</td>
@@ -202,6 +203,42 @@
                             break;
                         case ("-4"):
                             alert('非法操作');
+                            break;
+                        case ("0"):
+                            alert('参数不足');
+                            break;
+                        default:
+                            alert('修改失败');
+                            break;
+                    }
+
+                }
+            },
+            error:function() {
+                alert('修改失败');
+            }
+        })
+    }
+
+    /*释放工人*/
+    function taskStatusEdit(){
+        var u_id = {{$info.u_id}};
+        $.ajax({
+            url: 'userTaskStatusEdit',
+            type: 'GET',
+            data : {
+                "u_id" : u_id,
+            },
+            success : function(result) {
+                if(result==1){
+
+                    $("#task_status").html('闲置');
+                    alert('释放成功');
+                }else{
+                    switch (result)
+                    {
+                        case ("-3"):
+                            alert('释放失败');
                             break;
                         case ("0"):
                             alert('参数不足');
