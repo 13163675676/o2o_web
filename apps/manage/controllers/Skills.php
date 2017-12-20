@@ -3,7 +3,7 @@
  * @Author: Zhaoyu
  * @Date:   2017-09-08 14:30:07
  * @Last Modified by:   Zhaoyu
- * @Last Modified time: 2017-11-09 16:23:40
+ * @Last Modified time: 2017-12-15 15:35:50
  */
 namespace App\Controller;
 
@@ -15,7 +15,7 @@ class Skills extends \CLASSES\ManageBase
     }
     public function index()
     {
-        $dao_skills = new \MDAO\Skills(array('table'=>'skills'));
+        $dao_skills = new \MDAO\Skills();
         $condition = array();
         $condition['search_condition'] = isset($_GET['search_condition'])&&!empty($_GET['search_condition']) ? $_GET['search_condition'] : "";
         $condition['page'] = (isset($_REQUEST['page']) && !empty($_REQUEST['page'])) ? intval($_REQUEST['page']) : 1;
@@ -48,7 +48,7 @@ class Skills extends \CLASSES\ManageBase
     public function doSkillsAdd()
     {
         $jump = "/skills/skillsAdd";
-        $dao_skills = new \MDAO\Skills(array('table'=>'skills'));
+        $dao_skills = new \MDAO\Skills();
         if(!isset($_POST['s_name']) || !isset($_POST['s_name'])){
             msg("请填写技能名称", $status = 0, $jump);
         }else{
@@ -100,7 +100,7 @@ class Skills extends \CLASSES\ManageBase
 
 
 
-        $dao_skills = new \MDAO\Skills(array('table'=>'skills'));
+        $dao_skills = new \MDAO\Skills();
 
 
         $self_data = $dao_skills ->infoData(array('key'=>'s_id','val'=>$s_id));
@@ -117,7 +117,7 @@ class Skills extends \CLASSES\ManageBase
     {
 
        $jump = "/skills/index";
-        $dao_skills = new \MDAO\Skills(array('table'=>'skills'));
+        $dao_skills = new \MDAO\Skills();
 
         if(!isset($_POST['s_name']) || empty($_POST['s_name']) || !isset($_POST['s_id']) || empty($_POST['s_id'])){
             msg("参数不足", $status = 0, $jump);
@@ -164,7 +164,7 @@ class Skills extends \CLASSES\ManageBase
             $s_id = intval($_GET['s_id']);
             $s_status = intval($_GET['s_status']);
 
-            $dao_skills = new \MDAO\Skills(array('table'=>'skills'));
+            $dao_skills = new \MDAO\Skills();
             $res = $dao_skills ->updateData(array('s_status'=>$s_status),array('s_id'=>$s_id));
 
             if($res){

@@ -3,7 +3,7 @@
  * @Author: Zhaoyu
  * @Date:   2017-08-14 15:57:38
  * @Last Modified by:   Zhaoyu
- * @Last Modified time: 2017-11-09 14:32:20
+ * @Last Modified time: 2017-12-15 15:04:48
  */
 
 namespace App\Controller;
@@ -16,7 +16,7 @@ class Articles extends \CLASSES\ManageBase
     }
     public function categoryList()
     {
-        $dao_article = new \MDAO\Articles(array('table'=>'Articles_category'));
+        $dao_article = new \MDAO\Articles_category();
         /*获取分类数组*/
         $arr_ac = $dao_article->getChildTree();
         $this->tpl->assign('ac_data',json_encode($arr_ac));
@@ -29,7 +29,7 @@ class Articles extends \CLASSES\ManageBase
         $area = area(1);
 
         /*获取分类树*/
-        $dao_article = new \MDAO\Articles(array('table'=>'Articles_category'));
+        $dao_article = new \MDAO\Articles_category();
         $ac_tree = $dao_article->getTree();
 
         $this->tpl->assign("ac_tree",$ac_tree);
@@ -40,7 +40,7 @@ class Articles extends \CLASSES\ManageBase
     public function docategoryAdd()
     {
         $jump = "/Articles/categoryAdd";
-        $dao_article = new \MDAO\Articles(array('table'=>'Articles_category'));
+        $dao_article = new \MDAO\Articles_category();
         if(!isset($_POST['ac_name']) || !isset($_POST['ac_pid']) || empty($_POST['ac_name'])){
             msg("请填写分类名并选择父分类名", $status = 0, $jump);
         }else{
@@ -162,12 +162,12 @@ class Articles extends \CLASSES\ManageBase
             msg("参数错误,删除失败!", $status = 0, $jump);
         }else{
             /*判断有没有子集和该分类内有没有文件如果有删除失败*/
-            $dao_articles_category = new \MDAO\Articles(array('table'=>'Articles_category'));
+            $dao_articles_category = new \MDAO\Articles_category();
             $child_cat_id = $dao_articles_category ->infoData(array('key'=>'ac_pid','val'=>$ac_id,'fields'=>'ac_id'));
             if(!isset($child_cat_id['ac_id']))
             {
 
-                $dao_article = new \MDAO\Articles(array('table'=>'Articles'));
+                $dao_article = new \MDAO\Articles();
                 $child_art_id = $dao_article->infoData(array('key'=>'ac_id','val'=>$ac_id,'fields'=>'a_id'));
 
                 if(!isset($child_art_id['a_id']))
@@ -206,7 +206,7 @@ class Articles extends \CLASSES\ManageBase
         $area = area(1);
 
         /*获取除了自己子集的分类树*/
-        $dao_article = new \MDAO\Articles(array('table'=>'Articles_category'));
+        $dao_article = new \MDAO\Articles_category();
         $ac_tree = $dao_article->getTreeExceptChild($ac_id);
 
         $self_data = $dao_article->infoData(array('key'=>'ac_id','val'=>$ac_id));
@@ -236,14 +236,14 @@ class Articles extends \CLASSES\ManageBase
             msg("参数错误修改失败!", $status = 0, $jump);
         }
 
-        $dao_article = new \MDAO\Articles(array('table'=>'Articles_category'));
+        $dao_article = new \MDAO\Articles_category();
         if(!isset($_POST['ac_name']) || !isset($_POST['ac_pid']) || (empty($_POST['ac_pid'])&&$_POST['ac_pid']!=="0") || empty($_POST['ac_name'])){
             msg("请填写分类名并选择父分类名", $status = 0, $jump);
         }else{
             /*判断分类名是否存在*/
             $ac_name = trim($_POST['ac_name']);
             $res = $dao_article->infoData(array('key'=>'ac_name','val'=>$ac_name,'fields'=>'ac_id'));
-            if(intval($res['ac_id']) > 0 && $res['ac_id'] != $ac_id){
+            if(!empty($res['ac_id']) && intval($res['ac_id']) > 0 && $res['ac_id'] != $ac_id){
                 msg("分类名已经存在!", $status = 0, $jump);
             }
         }
@@ -325,7 +325,7 @@ class Articles extends \CLASSES\ManageBase
         $condition['page'] = (isset($_REQUEST['page']) && !empty($_REQUEST['page'])) ? intval($_REQUEST['page']) : 1;
 
         /*获取文章列表*/
-        $dao_article = new \MDAO\Articles(array('table'=>'Articles'));
+        $dao_article = new \MDAO\Articles();
         $artivle_list_arr = $dao_article->getArticleList($condition);
 
         $this->myPager($artivle_list_arr['pager']);
@@ -335,7 +335,7 @@ class Articles extends \CLASSES\ManageBase
         $dao_manager =  new \MDAO\Managers(array('table'=>'Managers'));
 
         /*获取分类树*/
-        $dao_article = new \MDAO\Articles(array('table'=>'Articles_category'));
+        $dao_article = new \MDAO\Articles_category();
         $ac_tree = $dao_article->getTree();
         if(!empty($condition['search_condition'])){
             $this->tpl->assign("search_condition",$condition['search_condition']);
@@ -363,12 +363,12 @@ class Articles extends \CLASSES\ManageBase
         $area = area(1);
 
         /*获取分类树*/
-        $dao_article_cat = new \MDAO\Articles(array('table'=>'Articles_category'));
+        $dao_article_cat = new \MDAO\Articles_category();
         $ac_tree = $dao_article_cat ->getTree();
 
 
         /*获取当前id数据*/
-        $dao_article = new \MDAO\Articles(array('table'=>'Articles'));
+        $dao_article = new \MDAO\Articles();
         $self_data = $dao_article->infoData(array(
             'a_id' => $a_id,
             'pager'=>false,
@@ -376,7 +376,7 @@ class Articles extends \CLASSES\ManageBase
                 ));
 
         /*获取文章详情数据*/
-        $dao_ext_article = new \MDAO\Articles(array('table'=>'articles_ext'));
+        $dao_ext_article = new \MDAO\Articles_ext();
         $ext_data = $dao_ext_article -> infoData(array('key'=>'a_id','val'=>$a_id));
 
         /*简化数据格式*/
@@ -407,7 +407,7 @@ class Articles extends \CLASSES\ManageBase
     {
 
         $jump = "/Articles/index";
-        $dao_article = new \MDAO\Articles(array('table'=>'Articles'));
+        $dao_article = new \MDAO\Articles();
         if(!isset($_POST['a_id']) || empty($_POST['a_id'])){
              msg("参数不足", $status = 0, $jump);
         }
@@ -480,7 +480,7 @@ class Articles extends \CLASSES\ManageBase
         $res = $dao_article->updateData($data,array('a_id'=>$a_id));
         if($res){
             $ext_data['a_desc'] = isset($_POST['a_desc'])&&!empty($_POST['a_desc'])?htmlspecialchars($_POST['a_desc']):"";
-            $dao_article_ext = new \MDAO\Articles(array('table'=>'Articles_ext'));
+            $dao_article_ext = new \MDAO\Articles_ext();
             $res = $dao_article_ext -> updateData($ext_data,array('a_id'=>$a_id));
             if($res){
                 msg("文章修改成功", $status = 1, $jump);
@@ -501,7 +501,7 @@ class Articles extends \CLASSES\ManageBase
         $area = area(1);
 
         /*获取分类树*/
-        $dao_article = new \MDAO\Articles(array('table'=>'Articles_category'));
+        $dao_article = new \MDAO\Articles_category();
         $ac_tree = $dao_article->getTree();
 
         $this->tpl->assign("ac_tree",$ac_tree);
@@ -518,7 +518,7 @@ class Articles extends \CLASSES\ManageBase
     public function doArticleAdd()
     {
         $jump = "/Articles/articleAdd";
-        $dao_article = new \MDAO\Articles(array('table'=>'Articles'));
+        $dao_article = new \MDAO\Articles();
         if(!isset($_POST['a_title']) || !isset($_POST['ac_id']) || empty($_POST['ac_id']) || empty($_POST['a_title'])){
             msg("请填写分类名并选择父分类名", $status = 0, $jump);
         }
@@ -578,7 +578,7 @@ class Articles extends \CLASSES\ManageBase
             $ext_data['a_desc'] = array();
             $ext_data['a_id'] = $a_id;
             $ext_data['a_desc'] = isset($_POST['a_desc'])&&!empty($_POST['a_desc'])?htmlspecialchars($_POST['a_desc']):"";
-            $dao_article_ext = new \MDAO\Articles(array('table'=>'Articles_ext'));
+            $dao_article_ext = new \MDAO\Articles_ext();
             $res = $dao_article_ext -> addData($ext_data);
             if($res){
                 msg("文章添加成功", $status = 1, $jump);
@@ -595,8 +595,8 @@ class Articles extends \CLASSES\ManageBase
         $jump = "/Articles/index";
         if(isset($_GET['a_id']) && !empty($_GET['a_id'])){
             $a_id = intval($_GET['a_id']);
-            $dao_article = new \MDAO\Articles(array('table'=>'Articles'));
-            $dao_article_ext = new \MDAO\Articles(array('table'=>'articles_ext'));
+            $dao_article = new \MDAO\Articles();
+            $dao_article_ext = new \MDAO\Articles_ext();
 
             $res = $dao_article -> delData($a_id);
             $res = $dao_article_ext -> delData($a_id);

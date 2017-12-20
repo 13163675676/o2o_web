@@ -3,7 +3,7 @@
  * @Author: Zhaoyu
  * @Date:   2017-09-06 11:30:52
  * @Last Modified by:   Zhaoyu
- * @Last Modified time: 2017-11-09 16:42:17
+ * @Last Modified time: 2017-12-15 15:14:05
  */
 
 namespace App\Controller;
@@ -16,7 +16,7 @@ class Complaints extends \CLASSES\ManageBase
     }
     public function categoryList()
     {
-        $dao_complaint = new \MDAO\Complaints(array('table'=>'complaints_type'));
+        $dao_complaint = new \MDAO\Complaints_type();
         $condition['page'] = (isset($_REQUEST['page']) && !empty($_REQUEST['page'])) ? intval($_REQUEST['page']) : 1;
         if (isset($_REQUEST['ct_type']) && $_REQUEST['ct_type'] > -1) $condition['ct_type'] = intval($_REQUEST['ct_type']);
         /*获取分类数组*/
@@ -36,7 +36,7 @@ class Complaints extends \CLASSES\ManageBase
     public function docategoryAdd()
     {
         $jump = "/Complaints/categoryAdd";
-        $dao_complaints = new \MDAO\Complaints(array('table'=>'complaints_type'));
+        $dao_complaints = new \MDAO\Complaints_type();
         if(!isset($_POST['ct_name']) || !isset($_POST['ct_name'])){
             msg("请填写类型名称", $status = 0, $jump);
         }else{
@@ -82,7 +82,7 @@ class Complaints extends \CLASSES\ManageBase
 
 
 
-        $dao_complaints = new \MDAO\Complaints(array('table'=>'complaints_type'));
+        $dao_complaints = new \MDAO\Complaints_type();
 
 
         $self_data = $dao_complaints ->infoData(array('key'=>'ct_id','val'=>$ct_id));
@@ -99,7 +99,7 @@ class Complaints extends \CLASSES\ManageBase
     {
 
        $jump = "/Complaints/categoryList";
-        $dao_complaints = new \MDAO\Complaints(array('table'=>'complaints_type'));
+        $dao_complaints = new \MDAO\Complaints_type();
 
         if(!isset($_POST['ct_name']) || empty($_POST['ct_name']) || !isset($_POST['ct_id']) || empty($_POST['ct_id'])){
             msg("参数不足", $status = 0, $jump);
@@ -154,10 +154,10 @@ class Complaints extends \CLASSES\ManageBase
         $condition['leftjoin'] = array('complaints_ext', 'complaints_ext.c_id = complaints.c_id');
         $condition['fields'] = 'complaints.*, complaints_ext.c_id as ct_c_id, complaints_ext.c_desc, complaints_ext.c_img, complaints_ext.c_replay,  complaints_ext.c_mark';
         /*获取投诉列表*/
-        $dao_complaints = new \MDAO\Complaints(array('table'=>'complaints'));
+        $dao_complaints = new \MDAO\Complaints();
         $complaints_list_arr = $dao_complaints->listData($condition);
 //print_r($complaints_list_arr);
-        $dao_complaints_type = new \MDAO\Complaints(array('table'=>'complaints_type'));
+        $dao_complaints_type = new \MDAO\Complaints_type();
         $complaints_type_list_arr = $dao_complaints_type->listData(array('pager' => 0));
 
         if (!empty($complaints_list_arr['data']))
@@ -229,7 +229,7 @@ class Complaints extends \CLASSES\ManageBase
             $c_last_edit_time = time();
             $c_last_editor = static::$manager_status;
 
-            $dao_complaints = new \MDAO\Complaints(array('table'=>'complaints'));
+            $dao_complaints = new \MDAO\Complaints();
             $res = $dao_complaints ->updateData(array('c_status'=>$c_status,'c_last_edit_time'=>$c_last_edit_time,'c_last_editor'=>$c_last_editor),array('c_id'=>$c_id));
 
             if($res){

@@ -3,7 +3,7 @@
  * @Author: Zhaoyu
  * @Date:   2017-09-04 17:53:06
  * @Last Modified by:   Zhaoyu
- * @Last Modified time: 2017-11-09 16:29:12
+ * @Last Modified time: 2017-12-15 13:54:42
  */
 namespace App\Controller;
 
@@ -23,7 +23,7 @@ class Advertising extends \CLASSES\ManageBase
         $condition['page'] = (isset($_REQUEST['page']) && !empty($_REQUEST['page'])) ? intval($_REQUEST['page']) : 1;
 
         /*获取文章列表*/
-        $dao_advertising = new \MDAO\Advertising(array('table'=>'Advertising'));
+        $dao_advertising = new \MDAO\Advertising();
         $list = $dao_advertising -> advertisingList($condition);
 
 
@@ -60,7 +60,7 @@ class Advertising extends \CLASSES\ManageBase
     public function doAdvertisingAdd()
     {
         $jump = "/Advertising/AdvertisingAdd";
-        $dao_advertising = new \MDAO\Advertising(array('table'=>'advertising'));
+        $dao_advertising = new \MDAO\Advertising();
         if(!isset($_POST['a_title']) || empty($_POST['a_title']) ){
             msg("请填写广告标题", $status = 0, $jump);
         }
@@ -126,7 +126,7 @@ class Advertising extends \CLASSES\ManageBase
         $jump = "/Advertising/index";
         if(isset($_GET['a_id']) && !empty($_GET['a_id'])){
             $a_id = intval($_GET['a_id']);
-            $dao_advertising = new \MDAO\Advertising(array('table'=>'advertising'));
+            $dao_advertising = new \MDAO\Advertising();
             $res = $dao_advertising -> delData($a_id);
             if($res){
                 msg("文件删除成功!", $status = 1, $jump);
@@ -151,7 +151,7 @@ class Advertising extends \CLASSES\ManageBase
         $area = area(1);
 
         /*获取当前id数据*/
-        $dao_article = new \MDAO\Advertising(array('table'=>'advertising'));
+        $dao_article = new \MDAO\Advertising();
         $self_data = $dao_article->infoData(array(
             'a_id' => $a_id,
             'pager'=>false,
@@ -179,7 +179,7 @@ class Advertising extends \CLASSES\ManageBase
     {
 
         $jump = "/Advertising/index";
-        $dao_advertising = new \MDAO\Advertising(array('table'=>'advertising'));
+        $dao_advertising = new \MDAO\Advertising();
         if(!isset($_POST['a_id']) || empty($_POST['a_id']) || !isset($_POST['a_title']) || empty($_POST['a_title'])){
              msg("参数不足", $status = 0, $jump);
         }

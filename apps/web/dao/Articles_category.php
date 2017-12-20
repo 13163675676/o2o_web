@@ -1,30 +1,24 @@
 <?php
-namespace MDAO;
+/**
+ * @Author: Zhaoyu
+ * @Date:   2017-12-15 15:52:57
+ * @Last Modified by:   Zhaoyu
+ * @Last Modified time: 2017-12-15 15:53:37
+ */
+namespace WDAO;
 
-class Articles extends \MDAOBASE\DaoBase
+class Articles_category extends \MDAOBASE\DaoBase
 {
-	public $articles     = null;
-	public $articles_ext = null;
-
-	public function __construct()
+    public function __construct()
     {
-    	parent::__construct(array('table'=>'Articles'));
-	}
-
-	/**
-     * 获取文章分类数组
-     * @author zhaoyu
-     * @e-mail zhaoyu8292@qq.com
-     * @date   2017-08-14
-     * @return [type]            [description]
-     */
+        parent::__construct(array('table' => 'articles_category'));
+    }
 
     /*获取所有除了自己子集的分类树*/
     public function getTreeExceptChild($catid)
     {
         $data = $this->listData(array('pager'=>false));
         $child_arr = $this->_getChildren($data['data'],$catid,true);
-        // print_r($child_arr);die;
         if($child_arr){
             $ins = implode(',', $child_arr);
             $no_child_arr = $this->listData(array('fields'=>'ac_id,ac_name,ac_pid','ac_id' => array('type' => 'notin', 'value' => $child_arr),'pager'=>false));
@@ -69,7 +63,7 @@ class Articles extends \MDAOBASE\DaoBase
     /*递归引用输出树状模型*/
     public function getChildTree($catid=0){
 
-        $data = $this->listData(array('fields'=>'ac_id as tags ,ac_pid,ac_name as text','where'=>1,'pager'=>false));
+        $data = $this->listData(array('fields'=>'ac_id  ,ac_pid,ac_name','where'=>1,'pager'=>false));
 
         return $this->_getChildTree($data['data'],$catid);
     }
@@ -80,7 +74,7 @@ class Articles extends \MDAOBASE\DaoBase
 
         foreach ($data as $k => $v) {
             if($pid == $v['ac_pid']){
-                $res = $this->_getChildTree($data,$v['tags']);
+                $res = $this->_getChildTree($data,$v['ac_id']);
                 if($res){
                    $v['nodes'] =  $res;
                 }
@@ -92,7 +86,7 @@ class Articles extends \MDAOBASE\DaoBase
         return $tree;
     }
 
-	/*递归处理 输出所有子分类id*/
+    /*递归处理 输出所有子分类id*/
     public function _getChildren($data,$catid,$isClear=false)
     {
         static $child = array();
@@ -115,34 +109,40 @@ class Articles extends \MDAOBASE\DaoBase
     {
         $a_id_arr = array();
         $page = $condition['page'];
+        $pager = empty($page) ? false : true;
         $info = array();
         $info = array(
-            'pager'=>true,'page'=>$page,
-            'fields'=>'a_id,a_title,a_info,managers.m_name as a_author,a_last_edit_time' ,
-            'leftjoin'=>array('managers',"managers.m_id = articles.a_author"),
+            'pager'=>$pager,'page'=>$page,
+            'fields'=>'a_id,a_title,a_in_time,a_link,a_img,a_top,a_recommend' ,
             );
+        $time = time();
+        $info['where'] = 'a_status=1 AND (a_start_time <= '.$time.' OR a_start_time = 0 )
+        AND (a_end_time >= '.$time.' OR a_end_time = 0)';
+
 
        if($condition['ac_id'] > 0)
        {
-            /*获取文章信息*/
-            $d_ac = new \MDAO\Articles(array('table'=>'Articles_category'));
-            $ac_id = $condition['ac_id'];
-            $page = $condition['page'];
-            $data_ac = $d_ac->listData();
-            $child_arr = array();
+            /*如果要求有子集*/
+            if($condition['son'] > 0){
+                /*获取文章信息*/
+                $d_ac = new \WDAO\Articles(array('table'=>'Articles_category'));
+                $ac_id = $condition['ac_id'];
+                $data_ac = $d_ac->listData();
+                $child_arr = array();
 
-            $child_arr = getChildren($data_ac['data'],$ac_id,"ac_id","ac_pid",true);
-            array_unshift($child_arr,"{$ac_id}");
-            $info['in'] = array('ac_id',$child_arr);
+                $child_arr = getChildren($data_ac['data'],$ac_id,"ac_id","ac_pid",true);
+                array_unshift($child_arr,"{$ac_id}");
+                $info['in'] = array('ac_id',$child_arr);
+            }else{
+               /*不要求子集*/
+                $info['ac_id'] = $condition['ac_id'];
+            }
+
+
 
 
        }
-       if(!empty($condition['search_condition'])){
 
-            $info['a_title'] =  array('type' => 'like', 'value' => $condition['search_condition']);
-
-       }
-       // var_dump($info);die;
             /*获取所有文章信息*/
             $a_id_arr = $this->listData($info);
 

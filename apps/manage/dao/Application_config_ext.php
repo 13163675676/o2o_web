@@ -1,13 +1,13 @@
 <?php
 /**
  * @Author: Zhaoyu
- * @Date:   2017-09-13 15:11:27
+ * @Date:   2017-12-15 14:49:49
  * @Last Modified by:   Zhaoyu
- * @Last Modified time: 2017-12-15 14:51:12
+ * @Last Modified time: 2017-12-15 14:50:25
  */
 namespace MDAO;
 
-class Application_config extends \MDAOBASE\DaoBase
+class Application_config_ext extends \MDAOBASE\DaoBase
 {
     public function __construct()
     {

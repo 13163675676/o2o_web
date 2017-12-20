@@ -6,9 +6,9 @@ class Articles extends \MDAOBASE\DaoBase
 	public $articles     = null;
 	public $articles_ext = null;
 
-	public function __construct($data)
+	public function __construct()
     {
-    	parent::__construct($data);
+    	parent::__construct(array('table'=>'articles'));
 	}
 
 	/**

@@ -3,7 +3,7 @@
  * @Author: Zhaoyu
  * @Date:   2017-09-12 15:53:36
  * @Last Modified by:   Zhaoyu
- * @Last Modified time: 2017-10-10 14:51:39
+ * @Last Modified time: 2017-12-15 14:51:02
  */
 
 namespace App\Controller;
@@ -16,7 +16,7 @@ class Application_config extends \CLASSES\ManageBase
     }
     public function index()
     {
-        $dao_application_config = new \MDAO\Application_config(array('table'=>'application_config'));
+        $dao_application_config = new \MDAO\Application_config();
         $condition['page'] = (isset($_REQUEST['page']) && !empty($_REQUEST['page'])) ? intval($_REQUEST['page']) : 1;
         $condition['fields'] = 'application_config.ac_id as ac_id,ac_name,ac_value,ac_status,app_id,application_config_ext.ac_desc as ac_desc';
         $condition['leftjoin'] = array('application_config_ext','application_config.ac_id=application_config_ext.ac_id');
@@ -37,7 +37,7 @@ class Application_config extends \CLASSES\ManageBase
     public function doWebConfigEdit()
     {
        $jump = "/Application_config/index";
-        $dao_application_config = new \MDAO\Application_config(array('table'=>'application_config'));
+        $dao_application_config = new \MDAO\Application_config();
 
         $ac_id_arr = array();
 
@@ -66,7 +66,7 @@ class Application_config extends \CLASSES\ManageBase
 
             $data_ext['ac_desc'] = isset($_POST['desc_'.$value])?trim($_POST['desc_'.$value]):'';
             if(!empty($data_ext['ac_desc'])){
-                $dao_application_config_ext = new \MDAO\application_config(array('table'=>'application_config_ext'));
+                $dao_application_config_ext = new \MDAO\Application_config_ext();
                 $dao_application_config_ext -> updateData($data_ext,array('ac_id' => $value));
             }
 
@@ -75,7 +75,7 @@ class Application_config extends \CLASSES\ManageBase
         }
 
         if(!empty($_POST['ac_name'])){
-            $dao_application_config = new \MDAO\Application_config(array('table'=>'application_config'));
+            $dao_application_config = new \MDAO\Application_config();
                 /*判断分类名是否存在*/
                 $res = $dao_application_config ->infoData(array('key'=>'ac_name','val'=>$_POST['ac_name'],'fields'=>'ac_id'));
 
@@ -96,7 +96,7 @@ class Application_config extends \CLASSES\ManageBase
             if($ac_id){
                 $data_ext['ac_desc'] = isset($_POST['ac_desc'])?trim($_POST['ac_desc']):'';
                 $data_ext['ac_id'] = $ac_id;
-                $dao_application_config_ext = new \MDAO\application_config(array('table'=>'application_config_ext'));
+                $dao_application_config_ext = new \MDAO\Application_config_ext();
                 $dao_application_config_ext ->addData($data_ext);
             }
         }
@@ -118,8 +118,8 @@ class Application_config extends \CLASSES\ManageBase
         {
             msg("参数错误,删除失败!", $status = 0, $jump);
         }else{
-                $dao_application_config = new \MDAO\Application_config(array('table'=>'application_config'));
-                $dao_application_config_ext = new \MDAO\Application_config(array('table'=>'application_config_ext'));
+                $dao_application_config = new \MDAO\Application_config();
+                $dao_application_config_ext = new \MDAO\Application_config_ext();
 
                     $res = $dao_application_config->delData($ac_id);
                     if($res)
@@ -141,7 +141,7 @@ class Application_config extends \CLASSES\ManageBase
     /*生成配置文件*/
     private function createFile()
     {
-        $dao_application_config = new \MDAO\application_config(array('table'=>'application_config'));
+        $dao_application_config = new \MDAO\application_config();
         $data = $dao_application_config ->listData(array('pager'=>false,'fields'=>'ac_name,ac_value','ac_status'=>1));
 
         $res = array();

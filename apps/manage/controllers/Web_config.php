@@ -3,7 +3,7 @@
  * @Author: Zhaoyu
  * @Date:   2017-09-12 15:53:36
  * @Last Modified by:   Zhaoyu
- * @Last Modified time: 2017-10-10 14:29:35
+ * @Last Modified time: 2017-12-15 15:39:23
  */
 
 namespace App\Controller;
@@ -16,7 +16,7 @@ class Web_config extends \CLASSES\ManageBase
     }
     public function index()
     {
-        $dao_web_config = new \MDAO\Web_config(array('table'=>'web_config'));
+        $dao_web_config = new \MDAO\Web_config();
         $condition['page'] = (isset($_REQUEST['page']) && !empty($_REQUEST['page'])) ? intval($_REQUEST['page']) : 1;
         $condition['fields'] = 'web_config.wc_id as wc_id,wc_name,wc_value,wc_status,web_id,web_config_ext.wc_desc as wc_desc';
         $condition['leftjoin'] = array('web_config_ext','web_config.wc_id=web_config_ext.wc_id');
@@ -37,7 +37,7 @@ class Web_config extends \CLASSES\ManageBase
     public function doWebConfigEdit()
     {
        $jump = "/web_config/index";
-        $dao_web_config = new \MDAO\Web_config(array('table'=>'web_config'));
+        $dao_web_config = new \MDAO\Web_config();
 
         $wc_id_arr = array();
 
@@ -67,7 +67,7 @@ class Web_config extends \CLASSES\ManageBase
 
             $data_ext['wc_desc'] = isset($_POST['desc_'.$value])?trim($_POST['desc_'.$value]):'';
             if(!empty($data_ext['wc_desc'])){
-                $dao_web_config_ext = new \MDAO\Web_config(array('table'=>'web_config_ext'));
+                $dao_web_config_ext = new \MDAO\Web_config_ext();
                 $res = $dao_web_config_ext -> updateData($data_ext,array('wc_id' => $value));
             }
 
@@ -77,7 +77,7 @@ class Web_config extends \CLASSES\ManageBase
         }
 
         if(!empty($_POST['wc_name'])){
-            $dao_Web_config = new \MDAO\Web_config(array('table'=>'web_config'));
+            $dao_Web_config = new \MDAO\Web_config();
                 /*判断分类名是否存在*/
                 $res = $dao_Web_config ->infoData(array('key'=>'wc_name','val'=>$_POST['wc_name'],'fields'=>'wc_id'));
 
@@ -99,7 +99,7 @@ class Web_config extends \CLASSES\ManageBase
             if($wc_id){
                 $data_ext['wc_desc'] = isset($_POST['wc_desc'])?trim($_POST['wc_desc']):'';
                 $data_ext['wc_id'] = $wc_id;
-                $dao_web_config_ext = new \MDAO\Web_config(array('table'=>'web_config_ext'));
+                $dao_web_config_ext = new \MDAO\Web_config_ext();
                 $dao_web_config_ext ->addData($data_ext);
             }
 
@@ -122,8 +122,8 @@ class Web_config extends \CLASSES\ManageBase
         {
             msg("参数错误,删除失败!", $status = 0, $jump);
         }else{
-                $dao_Web_config = new \MDAO\Web_config(array('table'=>'web_config'));
-                $dao_web_config_ext = new \MDAO\Web_config(array('table'=>'web_config_ext'));
+                $dao_Web_config = new \MDAO\Web_config();
+                $dao_web_config_ext = new \MDAO\Web_config_ext();
 
 
                     $res = $dao_Web_config->delData($wc_id);
@@ -147,7 +147,7 @@ class Web_config extends \CLASSES\ManageBase
 
     private function createFile()
     {
-        $dao_Web_config = new \MDAO\Web_config(array('table'=>'web_config'));
+        $dao_Web_config = new \MDAO\Web_config();
         $data_0 = $dao_Web_config ->listData(array('pager'=>false,'fields'=>'wc_name,wc_value','wc_status'=>1,'web_id'=>0));
 
         $res_0 = array();

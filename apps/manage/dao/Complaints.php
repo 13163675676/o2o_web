@@ -3,16 +3,16 @@
  * @Author: Zhaoyu
  * @Date:   2017-09-06 13:14:42
  * @Last Modified by:   Zhaoyu
- * @Last Modified time: 2017-09-07 17:27:56
+ * @Last Modified time: 2017-12-15 15:19:37
  */
 
 namespace MDAO;
 
 class Complaints extends \MDAOBASE\DaoBase
 {
-    public function __construct($data)
+    public function __construct()
     {
-        parent::__construct($data);
+        parent::__construct(array('table'=>'complaints'));
     }
 
     /*获取投诉列表*/

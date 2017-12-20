@@ -3,9 +3,9 @@ namespace WDAO;
 
 class Users extends \MDAOBASE\DaoBase
 {
-    public function __construct($data)
+    public function __construct()
     {
-        parent::__construct($data);
+        parent::__construct(array('table'=>'users'));
     }
 
     public function uploadComplaintImg($content='',$path_dir='')
@@ -232,7 +232,7 @@ class Users extends \MDAOBASE\DaoBase
     }
 
     /*注册用户*/
-    public function Adduser($users_con,$data)
+    public function adduser($users_con,$data)
     {
         $users_con->db->start();
         $dao_users = new \WDAO\Users(array('table'=>'users'));

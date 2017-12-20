@@ -3,7 +3,7 @@
  * @Author: Zhaoyu
  * @Date:   2017-09-09 14:37:08
  * @Last Modified by:   Zhaoyu
- * @Last Modified time: 2017-10-23 10:11:23
+ * @Last Modified time: 2017-12-15 15:32:13
  */
 
 namespace App\Controller;
@@ -16,7 +16,7 @@ class Log extends \CLASSES\ManageBase
     }
     public function orders()
     {
-        $dao_log = new \MDAO\Log(array('table'=>'orders_log'));
+        $dao_log = new \MDAO\Orders_log();
         $data = array();
         if (!empty($_REQUEST['start_time'])) $data['ol_in_time'][] = array('type' => 'ge', 'ge_value' => strtotime($_REQUEST['start_time']));
         if (!empty($_REQUEST['end_time'])) $data['ol_in_time'][] = array('type' => 'le', 'le_value' => strtotime($_REQUEST['end_time']));
@@ -57,7 +57,7 @@ class Log extends \CLASSES\ManageBase
 
     public function platformFunds()
     {
-        $dao_log = new \MDAO\Log(array('table'=>'platform_funds_log'));
+        $dao_log = new \MDAO\Platform_funds_log();
         $data = array();
 /*时间区间*/
         if (!empty($_REQUEST['start_time'])) $data['pfl_in_time'][] = array('type' => 'ge', 'ge_value' => strtotime($_REQUEST['start_time']));
@@ -126,7 +126,7 @@ class Log extends \CLASSES\ManageBase
 
     public function userRecharge()
     {
-        $dao_log = new \MDAO\Log(array('table'=>'user_recharge_log'));
+        $dao_log = new \MDAO\User_recharge_log();
         $data = array();
 /*时间区间*/
         if (!empty($_REQUEST['start_time'])) $data['url_in_time'][] = array('type' => 'ge', 'ge_value' => strtotime($_REQUEST['start_time']));
@@ -204,13 +204,13 @@ class Log extends \CLASSES\ManageBase
     public function changeRechargeStatus()
     {
         if(isset($_REQUEST['url_id']) && !empty($url_id = intval($_REQUEST['url_id'])) && isset($_REQUEST['url_status']) && (!empty(intval($_REQUEST['url_status'] || $_REQUEST['url_status'] === '0')))){
-            $dao_user_recharge_log = new \MDAO\Log(array('table'=>'user_recharge_log'));
+            $dao_user_recharge_log = new \MDAO\User_recharge_log();
             $url_status = intval($_REQUEST['url_status']);
             $info = $dao_user_recharge_log ->infoData(array('key'=>'url_id','val'=>$url_id));
             if($info['url_status'] == '1'){
                 echo json_encode(array('msg' => '确认成功后不可修改状态', 'status' => 0));exit;
             }else{
-                $dao_web_users = new \MDAO\Users(array('table'=>'users'));
+                $dao_web_users = new \MDAO\Users();
                 $dao_users_ext_funds = new \MDAO\Users_ext_funds();
                 /*获取用户当前余额*/
                 $user_url_overage = $dao_users_ext_funds ->infoData(array('key'=>'u_id','val'=>$info['u_id']));
@@ -239,7 +239,7 @@ class Log extends \CLASSES\ManageBase
     public function changeRechargeRemark()
     {
         if(isset($_REQUEST['url_id']) && !empty($url_id = intval($_REQUEST['url_id'])) && isset($_REQUEST['url_remark'])){
-            $dao_user_recharge_log = new \MDAO\Log(array('table'=>'user_recharge_log'));
+            $dao_user_recharge_log = new \MDAO\User_recharge_log();
             $url_remark = trim($_REQUEST['url_remark']);
             $res = $dao_user_recharge_log -> updateData(array('url_remark' =>$url_remark),array('url_id'=>$url_id));
             if($res){
@@ -257,11 +257,11 @@ class Log extends \CLASSES\ManageBase
     {
         if (isset($_REQUEST['uwl_id']) && intval($_REQUEST['uwl_id']) > 0 && isset($_REQUEST['uwl_proof']) && intval($_REQUEST['uwl_proof']) > 0)
         {
-            $dao_log_ext = new \MDAO\Log(array('table'=>'user_withdraw_log_ext'));
+            $dao_log_ext = new \MDAO\User_withdraw_log_ext();
             $result = $dao_log_ext->updateData(array('uwl_proof' => trim($_REQUEST['uwl_proof'])), array('uwl_id' => intval($_REQUEST['uwl_id'])));
             if ($result)
             {
-                $dao_log = new \MDAO\Log(array('table'=>'user_withdraw_log'));
+                $dao_log = new \MDAO\User_withdraw_log();
                 $dao_log->updateData(array('uwl_status' => 2), array('uwl_id' => intval($_REQUEST['uwl_id'])));
             }
             if (isset($_REQUEST['is_ajax']) && $_REQUEST['is_ajax'])
@@ -285,7 +285,7 @@ class Log extends \CLASSES\ManageBase
 
     public function userWithdraw()
     {
-        $dao_log = new \MDAO\Log(array('table'=>'user_withdraw_log'));
+        $dao_log = new \MDAO\User_withdraw_log();
         $data = array();
 /*时间区间*/
         if (!empty($_REQUEST['start_time'])) $data['uwl_in_time'][] = array('type' => 'ge', 'ge_value' => strtotime($_REQUEST['start_time']));
@@ -331,7 +331,7 @@ class Log extends \CLASSES\ManageBase
 
             $p_id_str = implode(',',$p_id_arr);
 
-            $dao_payments = new \MDAO\Log(array('table'=>'payments'));
+            $dao_payments = new \MDAO\Payments();
             $payments_arr = $dao_payments ->listData(array('pager'=>false,'p_id'=>array('type'=>'in','value'=>$p_id_str),'fields'=>'p_id,p_name'));
 
 
@@ -397,7 +397,7 @@ class Log extends \CLASSES\ManageBase
 
     public function userCurPosition()
     {
-        $dao_log = new \MDAO\Log(array('table'=>'users_cur_position'));
+        $dao_log = new \MDAO\Users_cur_position();
         $data = array();
 
 /*用户id*/
@@ -435,7 +435,7 @@ class Log extends \CLASSES\ManageBase
             }
             echo 0;exit;
         }
-        $dao_log = new \MDAO\Log(array('table'=>'user_withdraw_log'));
+        $dao_log = new \MDAO\User_withdraw_log();
         $result = $dao_log->updateData(array('uwl_status' => $uwl_status), array('uwl_id' => $uwl_id));
         if (!$result)
         {
@@ -502,7 +502,7 @@ class Log extends \CLASSES\ManageBase
             }
             echo 0;exit;
         }
-        $dao_log_ext = new \MDAO\Log(array('table'=>'user_withdraw_log_ext'));
+        $dao_log_ext = new \MDAO\User_withdraw_log_ext();
         $result = $dao_log_ext->updateData(array('uwl_remark' => $uwl_remark, 'uwl_proof' => $uwl_proof), array('uwl_id' => $uwl_id));
         if (!$result)
         {
@@ -512,7 +512,7 @@ class Log extends \CLASSES\ManageBase
             }
             echo 0;exit;
         }
-        $dao_log = new \MDAO\Log(array('table'=>'user_withdraw_log'));
+        $dao_log = new \MDAO\User_withdraw_log();
         $dao_log->updateData(array('uwl_status' => 2), array('uwl_id' => $uwl_id));
         //$this->sendWithdrawMessage();
         $info = $dao_log->infoData($uwl_id);
@@ -553,7 +553,7 @@ class Log extends \CLASSES\ManageBase
             }
             echo 0;exit;
         }
-        $dao_log = new \MDAO\Log(array('table'=>'user_withdraw_log'));
+        $dao_log = new \MDAO\User_withdraw_log();
         $info = $dao_log->infoData($uwl_id);
         if (!empty($info) && isset($info['u_id']) && $info['u_id'] > 0)
         {

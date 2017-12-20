@@ -1,23 +1,18 @@
 <?php
+/**
+ * @Author: Zhaoyu
+ * @Date:   2017-12-15 14:53:39
+ * @Last Modified by:   Zhaoyu
+ * @Last Modified time: 2017-12-15 14:58:38
+ */
 namespace MDAO;
 
-class Articles extends \MDAOBASE\DaoBase
+class Articles_category extends \MDAOBASE\DaoBase
 {
-	public $articles     = null;
-	public $articles_ext = null;
-
-	public function __construct()
+    public function __construct()
     {
-    	parent::__construct(array('table'=>'Articles'));
-	}
-
-	/**
-     * 获取文章分类数组
-     * @author zhaoyu
-     * @e-mail zhaoyu8292@qq.com
-     * @date   2017-08-14
-     * @return [type]            [description]
-     */
+        parent::__construct(array('table'=>'Articles_category'));
+    }
 
     /*获取所有除了自己子集的分类树*/
     public function getTreeExceptChild($catid)
@@ -92,7 +87,7 @@ class Articles extends \MDAOBASE\DaoBase
         return $tree;
     }
 
-	/*递归处理 输出所有子分类id*/
+    /*递归处理 输出所有子分类id*/
     public function _getChildren($data,$catid,$isClear=false)
     {
         static $child = array();
@@ -148,5 +143,4 @@ class Articles extends \MDAOBASE\DaoBase
 
        return $a_id_arr;
     }
-
 }
